@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Oct  1 18:18:39 2017
-
-@author: ZES
-"""
 from PlayerClasses import Player, Human 
 from AIClass import AI
 from GameBoard import GameBoard

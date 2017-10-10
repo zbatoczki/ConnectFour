@@ -1,7 +1,7 @@
 from abc import ABC, ABCMeta, abstractmethod
 
+#abstract class for human and AI players
 class Player(metaclass=ABCMeta):
-	"""docstring for Player"""
 	chip = "" #'O' or 'X'
 
 	def __init__(self, chip):
@@ -16,7 +16,6 @@ class Human(Player):
 		super(Human, self).__init__(chip)
 
 	def playTurn(self, board):
-		#chipPosition = ()
 		column = int(input("Pick a column > "))
 		column -= 1
 		while True:

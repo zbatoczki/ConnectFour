@@ -12,7 +12,6 @@ class AI(Player):
 		self.depth = int(input("Enter a difficulty from 1 to 6.\nYou can go higher, but performance will take longer.\n> "))
 
 	def playTurn(self, board):
-		#print("Enemy turn...")
 		move = self.miniMax(self.chip, board, self.depth)
 		board.addChip(self.chip, move[1], move[2])
 		return move[1], move[2]
@@ -33,10 +32,10 @@ class AI(Player):
 		diagonal1Score = 0
 		diagonal2Score = 0
 
-		'''	// Vertical points
+		'''	// Vertical
 		    // Check each column for vertical score
 		    // 
-		    // Possible situations
+		    // 3 pssible situations per column
 		    //  0  1  2  3  4  5  6
 		    // [x][ ][ ][ ][ ][ ][ ] 0
 		    // [x][x][ ][ ][ ][ ][ ] 1
@@ -50,13 +49,12 @@ class AI(Player):
 			for column in range(board.boardWidth):
 				score = self.scorePosition(board, row, column, 1, 0)
 				verticalScore += score
-				#print("VERTICAL SCORE: ", verticalScore)
 
 		'''
-			// Horizontal points
+			// Horizontal
 		    // Check each row's score
 		    // 
-		    // Possible situations
+		    // 4 possible situations per row
 		    //  0  1  2  3  4  5  6
 		    // [x][x][x][x][ ][ ][ ] 0
 		    // [ ][x][x][x][x][ ][ ] 1
@@ -69,11 +67,10 @@ class AI(Player):
 			for column in range(board.boardWidth - 3):
 				score = self.scorePosition(board, row, column, 0, 1)
 				horizontalScore += score
-				#print("HORIZONTAL SCORE: ", horizontalScore)
 
 		'''	// Diagonal points 1 (negative-slope)
 		    //
-		    // Possible situation
+		    // 
 		    //  0  1  2  3  4  5  6
 		    // [x][ ][ ][ ][ ][ ][ ] 0
 		    // [ ][x][ ][ ][ ][ ][ ] 1
@@ -86,12 +83,11 @@ class AI(Player):
 			for column in range(board.boardWidth - 3):
 				score = self.scorePosition(board, row, column, 1, 1)
 				diagonal1Score += score
-				#print("DIAGONAL 1 SCORE: ", diagonal1Score)
 
 		'''
-		    // Diagonal points 2 (right-bottom)
+		    // Diagonal points 2 (positive slope)
 		    //
-		    // Possible situation
+		    // 
 		    //  0  1  2  3  4  5  6
 		    // [ ][ ][ ][x][ ][ ][ ] 0
 		    // [ ][ ][x][ ][ ][ ][ ] 1
@@ -104,7 +100,6 @@ class AI(Player):
 			for column in range(board.boardWidth - 5):
 				score = self.scorePosition(board, row, column, -1, 1)
 				diagonal2Score += score
-				#print("DIAGONAL 2 SCORE: ", diagonal2Score)
 
 		return horizontalScore + verticalScore + diagonal1Score + diagonal2Score
 	
@@ -152,28 +147,25 @@ class AI(Player):
 
 	def miniMax(self, player, board, depth, alpha = -INFINITY, beta = INFINITY):
 		nextMoves = self.generateMoves(board)
-		#print("---POSSIBLE MOVES---\n", nextMoves, end="\n\n")
 		score = None
 		bestRow = -1
 		bestColumn = -1
 		if not nextMoves or depth == 0: #if list of next moves is empty or or reached root
 			score = self.evaluateHeuristic(board)
-			#print("SCORE FROM MINIMAX: ", score)
-			#print("================================================\n")
 			return score, bestRow, bestColumn
 		else:
 			for move in nextMoves:
 				#try move
 				board.addChip(player, move[0], move[1])
 				if player == self.chip: #if player is AI (max), switch to human (min)
-					#print("CALLING MIN...")
+					#MIN
 					score = self.miniMax('O', board, depth-1, alpha, beta)[0]
 					if score > alpha:
 						alpha = score
 						bestRow = move[0]
 						bestColumn = move[1]
 				else: #player is human (min), then switch to AI (max)
-					#print("CALLING MAX...")
+					#MAX
 					score = self.miniMax(self.chip, board, depth-1, alpha, beta)[0]
 					if score < beta:
 						beta = score
