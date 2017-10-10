@@ -13,7 +13,9 @@ class GameClient:
 	def __init__(self):
 		self.board = GameBoard()
 		self.human = Human('O')
-		self.ai = AI('X')		
+		difficulty = int(input("Enter a difficulty from 1 to 6.\nYou can go higher, but performance will take longer.\n> "))
+		showScores = input("Show values of minimax, alpha, and beta? (y/n) > ")
+		self.ai = AI('X', difficulty, showScores)		
 
 	def play(self):
 		print("Playing game...")
@@ -42,11 +44,12 @@ class GameClient:
 		self.winnerFound = False
 		self.humansTurn = True
 		self.board.resetBoard()
-		self.ai.setDifficulty()
+		difficulty = int(input("Enter a difficulty from 1 to 6.\nYou can go higher, but performance will take longer.\n> "))
+		self.ai.setDifficulty(difficulty)
 
 def endGame(winner):
 	print(winner, end=" ")
-	userInput = input("Play again? (Y/N)\n").lower()
+	userInput = input("Play again? (y/n)\n")
 	return True if userInput == 'y' else False 
 
 if __name__ == "__main__":

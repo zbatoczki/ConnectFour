@@ -4,12 +4,18 @@ from PlayerClasses import Player
 INFINITY = math.inf
 class AI(Player):	
 	depth = None
-	def __init__(self, chip='X'):
+	showScores = False
+	def __init__(self, chip='X', difficulty=1, showScores='n'):
 		super(AI, self).__init__(chip)
-		self.setDifficulty()
+		self.setDifficulty(difficulty)
+		self.logScores(showScores)		
 
-	def setDifficulty(self):
-		self.depth = int(input("Enter a difficulty from 1 to 6.\nYou can go higher, but performance will take longer.\n> "))
+	def setDifficulty(self, difficulty):
+		self.depth = difficulty
+
+	def logScores(self, showScores):
+		if showScores == 'y':
+			self.showScores = True
 
 	def playTurn(self, board):
 		move = self.miniMax(self.chip, board, self.depth)
@@ -146,12 +152,14 @@ class AI(Player):
 		return humanScore + AIScore
 
 	def miniMax(self, player, board, depth, alpha = -INFINITY, beta = INFINITY):
+		#time.sleep(0.1)
 		nextMoves = self.generateMoves(board)
 		score = None
 		bestRow = -1
 		bestColumn = -1
 		if not nextMoves or depth == 0: #if list of next moves is empty or or reached root
 			score = self.evaluateHeuristic(board)
+			if self.showScores: print("Score: {:6} | Alpha: {:6} | Beta: {:6}".format(score, alpha, beta))
 			return score, bestRow, bestColumn
 		else:
 			for move in nextMoves:
@@ -171,10 +179,11 @@ class AI(Player):
 						beta = score
 						bestRow = move[0]
 						bestColumn = move[1]
-
+				if self.showScores: print("Score: {:6} | Alpha: {:6} | Beta: {:6}".format(score, alpha, beta))
 				#undo move
 				board.removeChip(move[0], move[1])
 				if alpha >= beta:
+					if self.showScores: print("PRUNING!")
 					break
 		return alpha if player == self.chip else beta, bestRow, bestColumn
 
