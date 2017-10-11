@@ -1,4 +1,4 @@
-import math, time
+import math
 from PlayerClasses import Player
 
 INFINITY = math.inf
