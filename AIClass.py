@@ -4,6 +4,7 @@ from PlayerClasses import Player
 INFINITY = math.inf
 class AI(Player):	
 	depth = None
+	currentDepth = 0
 	showScores = False
 	def __init__(self, chip='X', difficulty=1, showScores='n'):
 		super(AI, self).__init__(chip)
@@ -18,10 +19,11 @@ class AI(Player):
 			self.showScores = True
 
 	def playTurn(self, board):
-		move = self.miniMax(self.chip, board, self.depth)
-		board.addChip(self.chip, move[1], move[2])
-		return move[1], move[2]
+		move = self.alphaBetaSearch(board)
+		board.addChip(self.chip, move[0], move[1])
+		return move
 
+	# returns tuple of (row, column)
 	def generateMoves(self, board):
 		possibleMoves = [] #list of possible positions
 		for column in range(board.boardWidth):
@@ -126,6 +128,7 @@ class AI(Player):
 				AIPoints += 1
 			elif currentChip == 'O': #player chip
 				humanPoints += 1
+			# empty otherwise
 			row += deltaROW
 			column += deltaCOL
 
@@ -151,39 +154,67 @@ class AI(Player):
 
 		return humanScore + AIScore
 
-	def miniMax(self, player, board, depth, alpha = -INFINITY, beta = INFINITY):
-		#time.sleep(0.1)
-		nextMoves = self.generateMoves(board)
-		score = None
-		bestRow = -1
-		bestColumn = -1
-		if not nextMoves or depth == 0: #if list of next moves is empty or or reached root
-			score = self.evaluateHeuristic(board)
-			if self.showScores: print("Score: {:6} | Alpha: {:6} | Beta: {:6}".format(score, alpha, beta))
-			return score, bestRow, bestColumn
-		else:
-			for move in nextMoves:
-				#try move
-				board.addChip(player, move[0], move[1])
-				if player == self.chip: #if player is AI (max), switch to human (min)
-					#MIN
-					score = self.miniMax('O', board, depth-1, alpha, beta)[0]
-					if score > alpha:
-						alpha = score
-						bestRow = move[0]
-						bestColumn = move[1]
-				else: #player is human (min), then switch to AI (max)
-					#MAX
-					score = self.miniMax(self.chip, board, depth-1, alpha, beta)[0]
-					if score < beta:
-						beta = score
-						bestRow = move[0]
-						bestColumn = move[1]
-				if self.showScores: print("Score: {:6} | Alpha: {:6} | Beta: {:6}".format(score, alpha, beta))
-				#undo move
-				board.removeChip(move[0], move[1])
-				if alpha >= beta:
-					if self.showScores: print("PRUNING!")
-					break
-		return alpha if player == self.chip else beta, bestRow, bestColumn
 
+
+	def alphaBetaSearch(self, state):
+		self.currentDepth = 0
+		scores = []
+		bestAction = None
+		v = max_value = -INFINITY
+		alpha = -INFINITY
+		beta = INFINITY
+		actions = self.generateMoves(state)
+		for action in actions:
+			state.addChip(self.chip, action[0], action[1])
+			v = self.minValue(state, alpha, beta)
+			scores.append(v)
+			if self.showScores: print("SCORE: ", v)
+			if v > max_value:
+				bestAction = action
+				max_value = v
+				alpha = max(alpha, max_value)
+			self.currentDepth -= 1
+			state.removeChip(action[0], action[1])
+		if len(scores) == 1:    
+			bestAction = actions[0]
+		return bestAction
+
+	def maxValue(self, state, alpha, beta):
+		self.currentDepth += 1
+		actions = self.generateMoves(state)
+		if not actions or self.currentDepth >= self.depth: #if list of next moves is empty or or reached root
+			score = self.evaluateHeuristic(state)
+			return score
+		else:
+			v = -INFINITY
+			for action in actions:
+				state.addChip(self.chip, action[0], action[1])
+				v = max(v, self.minValue(state, alpha, beta) )
+				if v >= beta:
+					self.currentDepth -= 1
+					state.removeChip(action[0], action[1])
+					return v
+				alpha = max(v, alpha)
+				self.currentDepth -= 1
+				state.removeChip(action[0], action[1])
+			return v
+
+	def minValue(self, state, alpha, beta):
+		self.currentDepth += 1
+		actions = self.generateMoves(state)
+		if not actions or self.currentDepth >= self.depth: #if list of next moves is empty or or reached root
+			score = self.evaluateHeuristic(state)
+			return score
+		else:
+			v = INFINITY
+			for action in actions:
+				state.addChip('O', action[0], action[1])
+				v = min(v, self.maxValue(state, alpha, beta) )
+				if v <= alpha:
+					self.currentDepth -= 1
+					state.removeChip(action[0], action[1])
+					return v
+				beta = min(v, beta)
+				self.currentDepth -= 1
+				state.removeChip(action[0], action[1])
+			return v

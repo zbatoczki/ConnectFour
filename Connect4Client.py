@@ -14,7 +14,7 @@ class GameClient:
 		self.board = GameBoard()
 		self.human = Human('O')
 		difficulty = int(input("Enter a difficulty from 1 to 6.\nYou can go higher, but performance will take longer.\n> "))
-		showScores = input("Show values of minimax, alpha, and beta? (y/n) > ")
+		showScores = input("Show scores? > ")
 		self.ai = AI('X', difficulty, showScores)		
 
 	def play(self):
@@ -24,16 +24,18 @@ class GameClient:
 		while self.currentRound <= self.MAX_ROUNDS and not self.winnerFound:
 			if self.humansTurn:
 				print("Player's turn...")
-				playedChip = self.human.playTurn(self.board)
+				playedChip = self.human.playTurn(self.board)				
 				self.winnerFound = self.board.isWinner(self.human.chip)
 				if self.winnerFound: winner = "PLAYER wins!"
 				self.humansTurn = False
+				print("Player played chip at column ", playedChip[1]+1)
 			else:
 				print("AI's turn...")
-				playedChip = self.ai.playTurn(self.board)
+				playedChip = self.ai.playTurn(self.board)				
 				self.winnerFound = self.board.isWinner(self.ai.chip)
 				if self.winnerFound: winner = "AI wins!"
 				self.humansTurn = True
+				print("AI played chip at column ", playedChip[1]+1)
 			self.currentRound += 1
 			self.board.printBoard()
 		return winner
