@@ -3,7 +3,7 @@ from PlayerClasses import Player
 
 INFINITY = math.inf
 class AI(Player):	
-	depth = None
+	depth = 0
 	currentDepth = 0
 	showScores = False
 	def __init__(self, chip='X', difficulty=1, showScores='n'):
@@ -105,7 +105,7 @@ class AI(Player):
 		    // [ ][ ][ ][ ][ ][ ][ ] 5
 		'''
 		for row in range(3, board.boardHeight):
-			for column in range(board.boardWidth - 5):
+			for column in range(board.boardWidth - 3):
 				score = self.scorePosition(board, row, column, -1, 1)
 				diagonal2Score += score
 
@@ -133,23 +133,23 @@ class AI(Player):
 			column += deltaCOL
 
 		if humanPoints == 1: 
-			humanScore = pow(-10, 0) # -1 point
+			humanScore = -1 # -1 point
 		elif humanPoints == 2:
-			humanScore = pow(-10, 1) # -10 points
+			humanScore = -10 # -10 points
 		elif humanPoints == 3:
-			humanScore = pow(-10, 2) # -100 points
+			humanScore = -100 # -100 points
 		elif humanPoints == 4:
-			humanScore = pow(-10, 3) # -1000 points
+			humanScore = -1000 # -1000 points
 		# 0 otherwise
 
 		if AIPoints == 1: 
-			AIScore = pow(10, 0) # 1 point
+			AIScore = 1 # 1 point
 		elif AIPoints == 2:
-			AIScore = pow(10, 1) # 10 points
+			AIScore = 10 # 10 points
 		elif AIPoints == 3:
-			AIScore = pow(10, 2) # 100 points
+			AIScore = 100 # 100 points
 		elif AIPoints == 4:
-			AIScore = pow(10, 3) # 1000 points
+			AIScore = 1000 # 1000 points
 		# 0 otherwise
 
 		return humanScore + AIScore
